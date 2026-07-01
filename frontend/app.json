@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "AI Trading Assistant",
+    "slug": "trading-assistant",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0f172a"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tradingassistant.app"
+    },
+    "android": {
+      "package": "com.tradingassistant.app"
+    },
+    "extra": {
+      "apiBaseUrl": "http://localhost:8000/api/v1"
+    }
+  }
+}

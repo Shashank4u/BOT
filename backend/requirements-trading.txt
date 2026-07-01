@@ -1,0 +1,4 @@
+# Windows-only MT5 dependencies
+# Install on the machine running MetaTrader 5 terminal
+-r requirements.txt
+MetaTrader5>=5.0.4682
