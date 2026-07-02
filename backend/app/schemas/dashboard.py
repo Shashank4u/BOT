@@ -12,6 +12,8 @@ class DashboardResponse(BaseSchema):
     watchlist_prices: list[TickPriceSchema]
     trading_mode: str
     bot_status: str
+    active_strategies: int = 0
+    auto_trading_enabled: bool = False
     market_status: str
     disclaimer: str = (
         "Market data is for analysis only. This app does not predict prices "

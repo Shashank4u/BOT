@@ -15,6 +15,7 @@ from app.core.middleware import APIKeyMiddleware
 from app.db.base import Base
 from app.db.session import AsyncSessionLocal, engine
 from app.services.bootstrap import ensure_default_owner
+from app.trading.auto_trader_runner import auto_trader_runner
 from app.trading.connection import auto_connect, shutdown
 import app.models  # noqa: F401 — register all models with SQLAlchemy
 
@@ -54,8 +55,11 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as exc:
         logger.warning("MT5 auto-connect skipped: %s", exc)
 
+    await auto_trader_runner.start()
+
     yield
 
+    await auto_trader_runner.stop()
     shutdown()
     await engine.dispose()
     logger.info("Application shutdown complete")

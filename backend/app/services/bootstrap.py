@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
+from app.models.auto_trading import AutoTradingConfig
 from app.models.settings import UserSettings
 from app.models.user import User
 
@@ -48,6 +49,13 @@ async def ensure_default_owner(session: AsyncSession) -> User:
         )
         session.add(settings)
         logger.info("Created default settings for owner")
+
+    config_result = await session.execute(
+        select(AutoTradingConfig).where(AutoTradingConfig.id == 1)
+    )
+    if config_result.scalar_one_or_none() is None:
+        session.add(AutoTradingConfig(id=1))
+        logger.info("Created default auto-trading config")
 
     await session.commit()
     return user

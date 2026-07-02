@@ -14,5 +14,6 @@ export type StrategiesStackParamList = {
 export type MoreStackParamList = {
   MoreMenu: undefined;
   Notifications: undefined;
+  BrokerAccount: undefined;
   Settings: undefined;
 };

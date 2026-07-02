@@ -21,6 +21,12 @@ export function DashboardScreen() {
   }
 
   const modeColor = data.trading_mode === 'demo' ? colors.demo : colors.warning;
+  const botColor =
+    data.bot_status === 'running'
+      ? colors.success
+      : data.bot_status === 'error'
+        ? colors.danger
+        : colors.textSecondary;
 
   return (
     <ScrollView
@@ -32,6 +38,10 @@ export function DashboardScreen() {
         <Text style={[styles.title, { color: colors.text }]}>Dashboard</Text>
         <Text style={[styles.mode, { color: modeColor }]}>
           {data.trading_mode.toUpperCase()} · {data.market_status}
+        </Text>
+        <Text style={[styles.bot, { color: botColor }]}>
+          Bot: {data.bot_status}
+          {data.auto_trading_enabled ? ` · ${data.active_strategies} active` : ''}
         </Text>
       </View>
 
@@ -71,6 +81,7 @@ const styles = StyleSheet.create({
   header: { marginBottom: 12 },
   title: { fontSize: 24, fontWeight: '800' },
   mode: { fontSize: 13, marginTop: 4, fontWeight: '600' },
+  bot: { fontSize: 12, marginTop: 4, fontWeight: '600' },
   statsRow: { flexDirection: 'row', marginHorizontal: -4 },
   section: { fontSize: 16, fontWeight: '700', marginTop: 16, marginBottom: 8 },
   priceRow: {

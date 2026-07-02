@@ -33,6 +33,42 @@ class TradeRepository:
         result = await self._session.execute(q)
         return list(result.scalars().all())
 
+    async def count_open_for_strategy(self, account_id: int, strategy_id: int) -> int:
+        result = await self._session.execute(
+            select(Trade).where(
+                Trade.account_id == account_id,
+                Trade.strategy_id == strategy_id,
+                Trade.status == TradeStatus.OPEN.value,
+            )
+        )
+        return len(list(result.scalars().all()))
+
+    async def count_open_for_symbol(
+        self, account_id: int, symbol: str, direction: str | None = None
+    ) -> int:
+        q = select(Trade).where(
+            Trade.account_id == account_id,
+            Trade.symbol == symbol.upper(),
+            Trade.status == TradeStatus.OPEN.value,
+        )
+        if direction:
+            q = q.where(Trade.direction == direction)
+        result = await self._session.execute(q)
+        return len(list(result.scalars().all()))
+
+    async def list_open_for_strategy_symbol(
+        self, account_id: int, strategy_id: int, symbol: str
+    ) -> list[Trade]:
+        result = await self._session.execute(
+            select(Trade).where(
+                Trade.account_id == account_id,
+                Trade.strategy_id == strategy_id,
+                Trade.symbol == symbol.upper(),
+                Trade.status == TradeStatus.OPEN.value,
+            )
+        )
+        return list(result.scalars().all())
+
     async def count_open(self, account_id: int) -> int:
         result = await self._session.execute(
             select(Trade).where(

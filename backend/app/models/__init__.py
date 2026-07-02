@@ -7,6 +7,7 @@ from app.models.trade import Order, Trade, TradeJournal
 from app.models.ai import AIAnalysis, Report
 from app.models.settings import Notification, UserSettings
 from app.models.market import BacktestRun, EconomicEvent, MarketScan
+from app.models.auto_trading import AutoTradingConfig
 
 __all__ = [
     "User",
@@ -22,4 +23,5 @@ __all__ = [
     "BacktestRun",
     "MarketScan",
     "EconomicEvent",
+    "AutoTradingConfig",
 ]

@@ -1,6 +1,6 @@
 # AI Trading Assistant — Project Progress
 
-> Last updated: Step 11 (React Native Mobile App)
+> Last updated: Step 13 (Auto Trading)
 >
 > Track what's **done**, **in progress**, and **remaining** for the full build.
 
@@ -10,8 +10,8 @@
 
 | Metric | Value |
 |--------|-------|
-| Steps completed | **11 / 12** |
-| Backend tests | **144** |
+| Steps completed | **13 / 13** |
+| Backend tests | **149** |
 | Auth / Login | **Skipped** — single-user app |
 | Default mode | **DEMO** — live trading requires explicit confirmation |
 
@@ -112,6 +112,16 @@
 - [x] Settings (API URL, dark mode, risk, live confirm)
 - [x] Notifications screen
 
+### Step 13 — Auto Trading
+- [x] Background scan loop (evaluate active strategies on interval)
+- [x] Auto-trading start/stop API + run-once for testing
+- [x] Risk checks before every auto-placed order
+- [x] Strategy activate/pause controls in mobile app
+- [x] Auto-trading toggle + scan interval in Settings
+- [x] Dashboard bot status (idle / waiting / running / error)
+- [x] Lot size from strategy risk % and stop-loss pips
+- [x] Broker account add/connect/disconnect API + mobile screen
+
 ---
 
 ## Remaining
@@ -144,6 +154,8 @@
 | Analytics | `/api/v1/analytics/*` | Done |
 | Telegram | `/api/v1/telegram/*` | Done |
 | Notifications | `/api/v1/notifications/*` | Done |
+| Auto Trading | `/api/v1/auto-trading/*` | Done |
+| Broker Accounts | `/api/v1/accounts/*` | Done |
 
 ---
 
@@ -154,6 +166,7 @@
 3. **User controls all strategies** — app executes your rules only
 4. **Live trading requires explicit confirmation** — `POST /api/v1/risk/confirm-live`
 5. **Full audit trail** — every order and trade logged to database
+6. **Auto-trading is OFF by default** — enable in Settings after activating strategies
 
 ---
 

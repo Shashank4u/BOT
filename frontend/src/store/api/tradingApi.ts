@@ -18,8 +18,22 @@ export interface DashboardData {
   }>;
   trading_mode: string;
   bot_status: string;
+  active_strategies: number;
+  auto_trading_enabled: boolean;
   market_status: string;
   disclaimer: string;
+}
+
+export interface AutoTradingStatus {
+  enabled: boolean;
+  interval_seconds: number;
+  min_confidence: number;
+  bot_status: string;
+  active_strategies: number;
+  last_scan_at: string | null;
+  last_message: string | null;
+  last_error: string | null;
+  orders_placed_last_scan: number;
 }
 
 export interface Trade {
@@ -75,7 +89,37 @@ export interface Notification {
   created_at: string;
 }
 
-export interface RiskSettings {
+export interface BrokerAccount {
+  id: number;
+  name: string;
+  broker: string;
+  account_type: string;
+  mt5_login: number;
+  mt5_server: string;
+  currency: string;
+  leverage: number;
+  balance: number;
+  equity: number;
+  margin: number;
+  free_margin: number;
+  is_active: boolean;
+  is_connected: boolean;
+  created_at: string | null;
+}
+
+export interface MarketStatus {
+  connected: boolean;
+  provider: string;
+  server: string | null;
+  login: number | null;
+  message: string;
+}
+
+export interface BrokerConnectResult {
+  account: BrokerAccount;
+  connection: MarketStatus;
+  message: string;
+}
   max_risk_per_trade: number;
   max_daily_loss: number;
   max_open_trades: number;
@@ -89,9 +133,38 @@ export const api = baseApi.injectEndpoints({
       query: () => '/dashboard',
       providesTags: ['Dashboard'],
     }),
+    getMarketStatus: builder.query<MarketStatus, void>({
+      query: () => '/market/status',
+      providesTags: ['Broker'],
+    }),
+    getBrokerAccounts: builder.query<BrokerAccount[], void>({
+      query: () => '/accounts',
+      providesTags: ['Broker'],
+    }),
+    getActiveBrokerAccount: builder.query<BrokerAccount | null, void>({
+      query: () => '/accounts/active',
+      providesTags: ['Broker'],
+    }),
+    addBrokerAccount: builder.mutation<BrokerConnectResult, Record<string, unknown>>({
+      query: (body) => ({ url: '/accounts', method: 'POST', body }),
+      invalidatesTags: ['Broker', 'Dashboard'],
+    }),
+    connectBrokerAccount: builder.mutation<BrokerConnectResult, number>({
+      query: (id) => ({ url: `/accounts/${id}/connect`, method: 'POST' }),
+      invalidatesTags: ['Broker', 'Dashboard'],
+    }),
+    disconnectBroker: builder.mutation<{ message: string; connection: MarketStatus }, void>({
+      query: () => ({ url: '/accounts/disconnect', method: 'POST' }),
+      invalidatesTags: ['Broker', 'Dashboard'],
+    }),
+    deleteBrokerAccount: builder.mutation<void, number>({
+      query: (id) => ({ url: `/accounts/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Broker', 'Dashboard'],
+    }),
     getTrades: builder.query<Trade[], string | void>({
       query: (status) => `/orders/trades${status ? `?status=${status}` : ''}`,
       providesTags: ['Trades'],
+      refetchOnMountOrArgChange: true,
     }),
     getStrategies: builder.query<Strategy[], void>({
       query: () => '/strategies',
@@ -104,6 +177,36 @@ export const api = baseApi.injectEndpoints({
     createStrategy: builder.mutation<Strategy, Record<string, unknown>>({
       query: (body) => ({ url: '/strategies', method: 'POST', body }),
       invalidatesTags: ['Strategies'],
+    }),
+    updateStrategy: builder.mutation<Strategy, { id: number; body: Record<string, unknown> }>({
+      query: ({ id, body }) => ({ url: `/strategies/${id}`, method: 'PATCH', body }),
+      invalidatesTags: ['Strategies', 'Dashboard'],
+    }),
+    getAutoTradingStatus: builder.query<AutoTradingStatus, void>({
+      query: () => '/auto-trading/status',
+      providesTags: ['AutoTrading'],
+    }),
+    startAutoTrading: builder.mutation<AutoTradingStatus, void>({
+      query: () => ({ url: '/auto-trading/start', method: 'POST' }),
+      invalidatesTags: ['AutoTrading', 'Dashboard', 'Trades', 'Notifications'],
+    }),
+    stopAutoTrading: builder.mutation<AutoTradingStatus, void>({
+      query: () => ({ url: '/auto-trading/stop', method: 'POST' }),
+      invalidatesTags: ['AutoTrading', 'Dashboard'],
+    }),
+    runAutoTradingOnce: builder.mutation<
+      { scanned: number; orders_placed: number },
+      void
+    >({
+      query: () => ({ url: '/auto-trading/run-once', method: 'POST' }),
+      invalidatesTags: ['AutoTrading', 'Dashboard', 'Trades', 'Notifications', 'Analytics'],
+    }),
+    updateAutoTradingSettings: builder.mutation<
+      AutoTradingStatus,
+      { interval_seconds?: number; min_confidence?: number }
+    >({
+      query: (body) => ({ url: '/auto-trading/settings', method: 'PATCH', body }),
+      invalidatesTags: ['AutoTrading'],
     }),
     getAnalyticsOverview: builder.query<AnalyticsOverview, number | void>({
       query: (days = 30) => `/analytics/overview?days=${days}`,
@@ -155,10 +258,23 @@ export const api = baseApi.injectEndpoints({
 
 export const {
   useGetDashboardQuery,
+  useGetMarketStatusQuery,
+  useGetBrokerAccountsQuery,
+  useGetActiveBrokerAccountQuery,
+  useAddBrokerAccountMutation,
+  useConnectBrokerAccountMutation,
+  useDisconnectBrokerMutation,
+  useDeleteBrokerAccountMutation,
   useGetTradesQuery,
   useGetStrategiesQuery,
   useSeedStrategiesMutation,
   useCreateStrategyMutation,
+  useUpdateStrategyMutation,
+  useGetAutoTradingStatusQuery,
+  useStartAutoTradingMutation,
+  useStopAutoTradingMutation,
+  useRunAutoTradingOnceMutation,
+  useUpdateAutoTradingSettingsMutation,
   useGetAnalyticsOverviewQuery,
   useGetEquityCurveQuery,
   useGetDailyPnlQuery,

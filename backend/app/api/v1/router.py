@@ -3,8 +3,10 @@
 from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
+    accounts,
     ai,
     analytics,
+    auto_trading,
     backtest,
     dashboard,
     health,
@@ -24,10 +26,12 @@ from app.api.v1.endpoints import (
 api_router = APIRouter()
 api_router.include_router(health.router)
 api_router.include_router(market.router)
+api_router.include_router(accounts.router)
 api_router.include_router(dashboard.router)
 api_router.include_router(indicators.router)
 api_router.include_router(patterns.router)
 api_router.include_router(strategies.router)
+api_router.include_router(auto_trading.router)
 api_router.include_router(risk.router)
 api_router.include_router(orders.router)
 api_router.include_router(journal.router)

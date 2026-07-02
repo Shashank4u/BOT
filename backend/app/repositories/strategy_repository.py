@@ -12,6 +12,17 @@ class StrategyRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
+    async def list_active(self, user_id: int) -> list[Strategy]:
+        result = await self._session.execute(
+            select(Strategy)
+            .where(Strategy.user_id == user_id, Strategy.status == "active")
+            .order_by(Strategy.name)
+        )
+        return list(result.scalars().all())
+
+    async def count_active(self, user_id: int) -> int:
+        return len(await self.list_active(user_id))
+
     async def list_all(self, user_id: int) -> list[Strategy]:
         result = await self._session.execute(
             select(Strategy)

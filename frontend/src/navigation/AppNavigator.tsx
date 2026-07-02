@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AnalyticsScreen } from '../screens/AnalyticsScreen';
 import { DashboardScreen } from '../screens/DashboardScreen';
+import { BrokerAccountScreen } from '../screens/BrokerAccountScreen';
 import { NotificationsScreen } from '../screens/NotificationsScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { StrategiesScreen } from '../screens/StrategiesScreen';
@@ -61,6 +62,7 @@ type MoreMenuProps = NativeStackScreenProps<MoreStackParamList, 'MoreMenu'>;
 function MoreMenuScreen({ navigation }: MoreMenuProps) {
   const { colors } = useTheme();
   const items: Array<{ label: string; screen: keyof MoreStackParamList }> = [
+    { label: 'Broker Account', screen: 'BrokerAccount' },
     { label: 'Notifications', screen: 'Notifications' },
     { label: 'Settings', screen: 'Settings' },
   ];
@@ -92,6 +94,7 @@ function MoreNavigator() {
       }}
     >
       <MoreStack.Screen name="MoreMenu" component={MoreMenuScreen} options={{ title: 'More' }} />
+      <MoreStack.Screen name="BrokerAccount" component={BrokerAccountScreen} options={{ title: 'Broker Account' }} />
       <MoreStack.Screen name="Notifications" component={NotificationsScreen} />
       <MoreStack.Screen name="Settings" component={SettingsScreen} />
     </MoreStack.Navigator>

@@ -13,6 +13,7 @@ from app.models.settings import UserSettings
 from app.models.user import User
 from app.schemas.dashboard import DashboardResponse
 from app.schemas.market import AccountInfoSchema, ConnectionStatusSchema, TickPriceSchema
+from app.services.auto_trader_service import AutoTraderService
 from app.services.market_data import MarketDataService, get_market_service
 from app.trading.constants import DEFAULT_SYMBOLS
 
@@ -51,6 +52,9 @@ async def get_dashboard(db: DbSession, svc: MarketSvc) -> DashboardResponse:
     account = svc.get_account()
     prices = svc.get_prices(watchlist[:10])
 
+    auto_svc = AutoTraderService(db)
+    auto_status = await auto_svc.get_status()
+
     return DashboardResponse(
         connection=ConnectionStatusSchema.model_validate(connection),
         account=AccountInfoSchema.model_validate(account),
@@ -68,6 +72,8 @@ async def get_dashboard(db: DbSession, svc: MarketSvc) -> DashboardResponse:
             for t in prices
         ],
         trading_mode=settings.trading_mode.value,
-        bot_status="idle",
+        bot_status=auto_status["bot_status"],
+        active_strategies=auto_status["active_strategies"],
+        auto_trading_enabled=auto_status["enabled"],
         market_status="open" if connection.connected else "disconnected",
     )

@@ -40,6 +40,8 @@ export const baseApi = createApi({
     'Notifications',
     'Analytics',
     'Journal',
+    'AutoTrading',
+    'Broker',
   ],
   endpoints: () => ({}),
 });
