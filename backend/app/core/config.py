@@ -83,14 +83,58 @@ class Settings(BaseSettings):
     # Rate limiting
     rate_limit_per_minute: int = 60
 
-    # CORS
+    # CORS — stored as comma-separated string in .env to avoid JSON parse issues
     cors_origins: list[str] = ["http://localhost:3000", "http://localhost:8081"]
 
     @field_validator("cors_origins", mode="before")
     @classmethod
     def parse_cors_origins(cls, value: str | list[str]) -> list[str]:
         if isinstance(value, str):
+            stripped = value.strip()
+            if stripped.startswith("["):
+                import json
+
+                return json.loads(stripped)
             return [origin.strip() for origin in value.split(",") if origin.strip()]
+        return value
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls,
+        init_settings,
+        env_settings,
+        dotenv_settings,
+        file_secret_settings,
+    ):
+        """Read CORS_ORIGINS as plain string before pydantic JSON-decodes list fields."""
+        from pydantic_settings.sources import DotEnvSettingsSource
+
+        class CorsDotEnvSettingsSource(DotEnvSettingsSource):
+            def decode_complex_value(self, field_name, field, value):
+                if field_name == "cors_origins":
+                    return value
+                return super().decode_complex_value(field_name, field, value)
+
+        return (
+            init_settings,
+            env_settings,
+            CorsDotEnvSettingsSource(settings_cls),
+            file_secret_settings,
+        )
+
+    @field_validator("mt5_login", mode="before")
+    @classmethod
+    def empty_int_to_none(cls, value: str | int | None) -> int | None:
+        if value == "" or value is None:
+            return None
+        return value
+
+    @field_validator("mt5_password", mode="before")
+    @classmethod
+    def empty_str_to_none(cls, value: str | None) -> str | None:
+        if value == "" or value is None:
+            return None
         return value
 
     @property

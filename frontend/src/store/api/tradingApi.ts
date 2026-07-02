@@ -120,6 +120,8 @@ export interface BrokerConnectResult {
   connection: MarketStatus;
   message: string;
 }
+
+export interface RiskSettings {
   max_risk_per_trade: number;
   max_daily_loss: number;
   max_open_trades: number;
@@ -164,7 +166,6 @@ export const api = baseApi.injectEndpoints({
     getTrades: builder.query<Trade[], string | void>({
       query: (status) => `/orders/trades${status ? `?status=${status}` : ''}`,
       providesTags: ['Trades'],
-      refetchOnMountOrArgChange: true,
     }),
     getStrategies: builder.query<Strategy[], void>({
       query: () => '/strategies',
