@@ -14,7 +14,8 @@
       "bundleIdentifier": "com.tradingassistant.app"
     },
     "android": {
-      "package": "com.tradingassistant.app"
+      "package": "com.tradingassistant.app",
+      "usesCleartextTraffic": true
     },
     "extra": {
       "apiBaseUrl": "http://localhost:8000/api/v1"
